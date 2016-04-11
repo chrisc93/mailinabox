@@ -81,9 +81,6 @@ chmod a+r /var/lib/mailinabox/mozilla-autoconfig.xml
 # make a default homepage
 if [ -d $STORAGE_ROOT/www/static ]; then mv $STORAGE_ROOT/www/static $STORAGE_ROOT/www/default; fi # migration #NODOC
 mkdir -p $STORAGE_ROOT/www/default
-if [ ! -f $STORAGE_ROOT/www/default/index.html ]; then
-	cp conf/www_default.html $STORAGE_ROOT/www/default/index.html
-fi
 chown -R $STORAGE_USER $STORAGE_ROOT/www
 
 # We previously installed a custom init script to start the PHP FastCGI daemon. #NODOC
