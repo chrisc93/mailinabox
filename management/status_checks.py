@@ -472,10 +472,10 @@ def check_dns_zone(domain, env, output, dns_zonefiles):
 def check_dns_zone_suggestions(domain, env, output, dns_zonefiles, domains_with_a_records):
 	# Warn if a custom DNS record is preventing this or the automatic www redirect from
 	# being served.
-	if domain in domains_with_a_records:
-		output.print_warning("""Web has been disabled for this domain because you have set a custom DNS record.""")
-	if "www." + domain in domains_with_a_records:
-		output.print_warning("""A redirect from 'www.%s' has been disabled for this domain because you have set a custom DNS record on the www subdomain.""" % domain)
+	#if domain in domains_with_a_records:
+	#	output.print_warning("""Web has been disabled for this domain because you have set a custom DNS record.""")
+	#if "www." + domain in domains_with_a_records:
+	#	output.print_warning("""A redirect from 'www.%s' has been disabled for this domain because you have set a custom DNS record on the www subdomain.""" % domain)
 
 	# Since DNSSEC is optional, if a DS record is NOT set at the registrar suggest it.
 	# (If it was set, we did the check earlier.)
