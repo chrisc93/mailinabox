@@ -1,25 +1,37 @@
 CHANGELOG
 =========
 
-In Development
---------------
+v0.18 (May 15, 2016)
+--------------------
+
+v0.18b was released immediately after fixing a Roundcube user accounts issue.
 
 ownCloud:
 
-* Update ownCloud to 8.2.3 
+* Updated to ownCloud to 8.2.3 
 
 Mail:
 
+* Roundcube is updated to version 1.1.5 and the Roundcube login screen now says "[hostname] Webmail" instead of "Mail-in-a-Box/Roundcube webmail".
 * Fixed a long-standing issue with training the spam filter not working (because of a file permissions issue).
 
 Control panel:
 
 * Munin system monitoring graphs are now zoomable.
-* When a reboot is required (due to Ubuntu security updates automatically installed), a Reboot Box button now appears.
+* When a reboot is required (due to Ubuntu security updates automatically installed), a Reboot Box button now appears on the System Status Checks page of the control panel.
+* It is now possible to add SRV and secondary MX records in the Custom DNS page.
+* Other minor fixes.
+
+System:
+
+* The fail2ban recidive jail, which blocks long-duration brute force attacks, now no longer sends the administrator emails (which were not helpful).
 
 Setup:
 
+* The system hostname is now set during setup.
 * A swap file is now created if system memory is less than 2GB, 5GB of free disk space is available, and if no swap file yet exists.
+* We now install Roundcube from the official GitHub repository instead of our own mirror, which we had previously created to solve problems with SourceForge.
+* DKIM was incorrectly set up on machines where "localhost" was defined as something other than "127.0.0.1".
 
 v0.17c (April 1, 2016)
 ----------------------

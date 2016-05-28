@@ -7,7 +7,7 @@
 #########################################################
 
 if [ -z "$TAG" ]; then
-	TAG=v0.17c
+	TAG=v0.18b
 fi
 
 # Are we running as root?
