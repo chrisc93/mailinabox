@@ -17,8 +17,8 @@ apt_install \
 apt-get purge -qq -y owncloud*
 
 # Install ownCloud from source of this version:
-owncloud_ver=8.2.3
-owncloud_hash=bfdf6166fbf6fc5438dc358600e7239d1c970613
+owncloud_ver=8.2.7
+owncloud_hash=723ba3f46dad219109cdf28dcc016fcd8a6bc434
 
 # Migrate <= v0.10 setups that stored the ownCloud config.php in /usr/local rather than
 # in STORAGE_ROOT. Move the file to STORAGE_ROOT.
@@ -92,7 +92,6 @@ if [ ! -f $STORAGE_ROOT/owncloud/owncloud.db ]; then
 	mkdir -p $STORAGE_ROOT/owncloud
 
 	# Create an initial configuration file.
-	TIMEZONE=$(cat /etc/timezone)
 	instanceid=oc$(echo $PRIMARY_HOSTNAME | sha1sum | fold -w 10 | head -n 1)
 	cat > $STORAGE_ROOT/owncloud/config.php <<EOF;
 <?php
@@ -125,7 +124,6 @@ if [ ! -f $STORAGE_ROOT/owncloud/owncloud.db ]; then
   'mail_smtppassword' => '',
   'mail_from_address' => 'owncloud',
   'mail_domain' => '$PRIMARY_HOSTNAME',
-  'logtimezone' => '$TIMEZONE',
 );
 ?>
 EOF
@@ -163,7 +161,11 @@ fi
 #   so set it here. It also can change if the box's PRIMARY_HOSTNAME changes, so
 #   this will make sure it has the right value.
 # * Some settings weren't included in previous versions of Mail-in-a-Box.
+# * We need to set the timezone to the system timezone to allow fail2ban to ban
+#   users within the proper timeframe
+# * We need to set the logdateformat to something that will work correctly with fail2ban
 # Use PHP to read the settings file, modify it, and write out the new settings array.
+TIMEZONE=$(cat /etc/timezone)
 CONFIG_TEMP=$(/bin/mktemp)
 php <<EOF > $CONFIG_TEMP && mv $CONFIG_TEMP $STORAGE_ROOT/owncloud/config.php;
 <?php
@@ -174,6 +176,9 @@ include("$STORAGE_ROOT/owncloud/config.php");
 \$CONFIG['memcache.local'] = '\\OC\\Memcache\\Memcached';
 \$CONFIG['overwrite.cli.url'] = '/cloud';
 \$CONFIG['mail_from_address'] = 'administrator'; # just the local part, matches our master administrator address
+
+\$CONFIG['logtimezone'] = '$TIMEZONE';
+\$CONFIG['logdateformat'] = 'Y-m-d H:i:s';
 
 echo "<?php\n\\\$CONFIG = ";
 var_export(\$CONFIG);
