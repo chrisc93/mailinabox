@@ -1,6 +1,38 @@
 CHANGELOG
 =========
 
+v0.21b (December 4, 2016)
+-------------------------
+
+This update corrects a first-time installation issue introduced in v0.21 caused by the new Exchange/ActiveSync feature.
+
+v0.21 (November 30, 2016)
+-------------------------
+
+This version updates ownCloud, which may include security fixes, and makes some other smaller improvements.
+
+Mail:
+
+* Header privacy filters were improperly running on the contents of forwarded email --- that's fixed.
+* We have another go at fixing a long-standing issue with training the spam filter (because of a file permissions issue).
+* Exchange/ActiveSync will now use your display name set in Roundcube in the From: line of outgoing email.
+
+ownCloud:
+
+* Updated ownCloud to version 9.1.1.
+
+Control panel:
+
+* Backups can now be made using rsync-over-ssh!
+* Status checks failed if the system doesn't support iptables or doesn't have ufw installed.
+* Added support for SSHFP records when sshd listens on non-standard ports.
+* Recommendations for TLS certificate providers were removed now that everyone mostly uses Let's Encrypt.
+
+System:
+
+* Ubuntu's "Upgrade to 16.04" notice is suppressed since you should not do that.
+* Lowered memory requirements to 512MB, display a warning if system memory is below 768MB.
+
 v0.20 (September 23, 2016)
 --------------------------
 

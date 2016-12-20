@@ -11,7 +11,7 @@ import dateutil.parser, dateutil.tz
 import idna
 import psutil
 
-from dns_update import get_dns_zones, build_tlsa_record, get_custom_dns_config, get_secondary_dns, get_custom_dns_record
+from dns_update import get_dns_zones, build_tlsa_record, get_custom_dns_config, get_secondary_dns, get_custom_dns_records
 from web_update import get_web_domains, get_domains_with_a_records
 from ssl_certificates import get_ssl_certificates, get_domain_ssl_files, check_certificate
 from mailconfig import get_mail_domains, get_mail_aliases
@@ -169,8 +169,19 @@ def run_system_checks(rounded_values, env, output):
 	check_free_memory(rounded_values, env, output)
 
 def check_ufw(env, output):
-	ufw = shell('check_output', ['ufw', 'status']).splitlines()
+	if not os.path.isfile('/usr/sbin/ufw'):
+		output.print_warning("""The ufw program was not installed. If your system is able to run iptables, rerun the setup.""")
+		return
 
+	code, ufw = shell('check_output', ['ufw', 'status'], trap=True)
+
+	if code != 0:
+		# The command failed, it's safe to say the firewall is disabled
+		output.print_warning("""The firewall is not working on this machine. An error was received
+					while trying to check the firewall. To investigate run 'sudo ufw status'.""")
+		return
+
+	ufw = ufw.splitlines()
 	if ufw[0] == "Status: active":
 		not_allowed_ports = 0
 		for service in get_services():
@@ -448,7 +459,7 @@ def check_dns_zone(domain, env, output, dns_zonefiles):
 	# half working.)
 
 	custom_dns_records = list(get_custom_dns_config(env)) # generator => list so we can reuse it
-	correct_ip = get_custom_dns_record(custom_dns_records, domain, "A") or env['PUBLIC_IP']
+	correct_ip = "; ".join(sorted(get_custom_dns_records(custom_dns_records, domain, "A"))) or env['PUBLIC_IP']
 	custom_secondary_ns = get_secondary_dns(custom_dns_records, mode="NS")
 	secondary_ns = custom_secondary_ns or ["ns2." + env['PRIMARY_HOSTNAME']]
 
