@@ -51,7 +51,7 @@ hide_output pip3 install --upgrade \
 # duplicity uses python 2 so we need to get the python 2 package of boto to have backups to S3.
 # boto from the Ubuntu package manager is too out-of-date -- it doesn't support the newer
 # S3 api used in some regions, which breaks backups to those regions.  See #627, #653.
-hide_output pip install --upgrade boto
+hide_output pip2 install --upgrade boto
 
 # CONFIGURATION
 
@@ -60,6 +60,31 @@ mkdir -p $STORAGE_ROOT/backup
 if [ ! -f $STORAGE_ROOT/backup/secret_key.txt ]; then
 	$(umask 077; openssl rand -base64 2048 > $STORAGE_ROOT/backup/secret_key.txt)
 fi
+
+
+# Download jQuery and Bootstrap local files
+
+# Make sure we have the directory to save to.
+assets_dir=/usr/local/lib/mailinabox/vendor/assets
+rm -rf $assets_dir
+mkdir -p $assets_dir
+
+# jQuery CDN URL
+jquery_version=2.1.4
+jquery_url=https://code.jquery.com
+
+# Get jQuery
+wget_verify $jquery_url/jquery-$jquery_version.min.js 43dc554608df885a59ddeece1598c6ace434d747 $assets_dir/jquery.min.js
+
+# Bootstrap CDN URL
+bootstrap_version=3.3.7
+bootstrap_url=https://github.com/twbs/bootstrap/releases/download/v$bootstrap_version/bootstrap-$bootstrap_version-dist.zip
+
+# Get Bootstrap
+wget_verify $bootstrap_url e6b1000b94e835ffd37f4c6dcbdad43f4b48a02a /tmp/bootstrap.zip
+unzip -q /tmp/bootstrap.zip -d /usr/local/lib/mailinabox/vendor/assets
+mv /usr/local/lib/mailinabox/vendor/assets/bootstrap-$bootstrap_version-dist /usr/local/lib/mailinabox/vendor/assets/bootstrap
+rm -f /tmp/bootstrap.zip
 
 # Link the management server daemon into a well known location.
 rm -f /usr/local/bin/mailinabox-daemon

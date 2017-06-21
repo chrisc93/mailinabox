@@ -1,16 +1,70 @@
 CHANGELOG
 =========
 
-In Development
---------------
+v0.23a (May 31, 2017)
+---------------------
+
+Corrects a problem in the new way third-party assets are downloaded during setup for the control panel, since v0.23.
+
+v0.23 (May 30, 2017)
+--------------------
+
+Mail:
+
+* The default theme for Roundcube was changed to the nicer Larry theme.
+* Exchange/ActiveSync support has been replaced with z-push 2.3.6 from z-push.org (rather than z-push-contrib).
+
+ownCloud (now Nextcloud):
+
+* ownCloud is replaced with Nextcloud 10.0.5.
+* Fixed an error in Owncloud/Nextcloud setup not updating domain when changing hostname.
+
+Control Panel/Management:
+
+* Fix an error in the control panel showing rsync backup status.
+* Fix an error in the control panel related to IPv6 addresses.
+* TLS certificates for internationalized domain names can now be provisioned from Let's Encrypt automatically.
+* Third-party assets used in the control panel (jQuery/Bootstrap) are now downloaded during setup and served from the box rather than from a CDN.
+
+DNS:
+
+* Add support for custom CAA records.
+
+v0.22 (April 2, 2017)
+---------------------
+
+Mail:
 
 * The CardDAV plugin has been added to Roundcube so that your ownCloud contacts are available in webmail.
-* Upgraded to ownCloud 9.1.2.
-* Upgraded to Roundcube 1.2.3.
-* The status checks page crashed when the mailinabox.email website was down - that's fixed.
+* Upgraded to Roundcube 1.2.4 and updated the persistent login plugin.
 * Allow larger messages to be checked by SpamAssassin.
+* Dovecot's vsz memory limit has been increased proportional to system memory.
+* Newly set user passwords must be at least eight characters.
+
+ownCloud:
+
+* Upgraded to ownCloud 9.1.4.
+
+Control Panel/Management:
+
+* The status checks page crashed when the mailinabox.email website was down - that's fixed.
 * Made nightly re-provisioning of TLS certificates less noisy.
-* Fixed bugs in rsync backup method.
+* Fixed bugs in rsync backup method and in the list of recent backups.
+* Fixed incorrect status checks errors about IPv6 addresses.
+* Fixed incorrect status checks errors for secondary nameservers if round-robin custom A records are set.
+* The management mail_log.py tool has been rewritten.
+
+DNS:
+
+* Added support for DSA, ED25519, and custom SSHFP records.
+
+System:
+
+* The SSH fail2ban jail was not activated.
+
+Installation:
+
+* At the end of installation, the SHA256 -- rather than SHA1 -- hash of the system's TLS certificate is shown.
 
 v0.21c (February 1, 2017)
 -------------------------
@@ -117,7 +171,7 @@ v0.18 (May 15, 2016)
 
 ownCloud:
 
-* Updated to ownCloud to 8.2.3 
+* Updated to ownCloud to 8.2.3
 
 Mail:
 
