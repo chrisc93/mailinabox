@@ -149,7 +149,10 @@ def make_domain_config(domain, templates, ssl_certificates, env):
 
 			# any proxy or redirect here?
 			for path, url in yaml.get("proxies", {}).items():
-				nginx_conf_extra += "\tlocation %s {\n\t\tproxy_pass %s;\n\t}\n" % (path, url)
+				nginx_conf_extra += "\tlocation %s {" % path
+				nginx_conf_extra += "\n\t\tproxy_pass %s;" % url
+				nginx_conf_extra += "\n\t\tproxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"
+				nginx_conf_extra += "\n\t}\n"
 			for path, url in yaml.get("redirects", {}).items():
 				nginx_conf_extra += "\trewrite %s %s permanent;\n" % (path, url)
 
@@ -158,9 +161,9 @@ def make_domain_config(domain, templates, ssl_certificates, env):
 
 	# Add the HSTS header.
 	if hsts == "yes":
-		nginx_conf_extra += "add_header Strict-Transport-Security max-age=31536000;\n"
+		nginx_conf_extra += "add_header Strict-Transport-Security max-age=15768000;\n"
 	elif hsts == "preload":
-		nginx_conf_extra += "add_header Strict-Transport-Security \"max-age=10886400; includeSubDomains; preload\";\n"
+		nginx_conf_extra += "add_header Strict-Transport-Security \"max-age=15768000; includeSubDomains; preload\";\n"
 
 	# Add in any user customizations in the includes/ folder.
 	nginx_conf_custom_include = os.path.join(env["STORAGE_ROOT"], "www", safe_domain_name(domain) + ".conf")

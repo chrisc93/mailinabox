@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/lib/mailinabox/env/bin/python
 # Utilities for installing and selecting SSL certificates.
 
 import os, os.path, re, shutil
@@ -556,7 +556,7 @@ def create_csr(domain, ssl_key, country_code, env):
                 "openssl", "req", "-new",
                 "-key", ssl_key,
                 "-sha256",
-                "-subj", "/C=%s/ST=/L=/O=/CN=%s" % (country_code, domain)])
+                "-subj", "/C=%s/CN=%s" % (country_code, domain)])
 
 def install_cert(domain, ssl_cert, ssl_chain, env, raw=False):
 	# Write the combined cert+chain to a temporary path and validate that it is OK.

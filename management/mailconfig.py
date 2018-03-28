@@ -1,4 +1,13 @@
-#!/usr/bin/python3
+#!/usr/local/lib/mailinabox/env/bin/python
+
+# NOTE:
+# This script is run both using the system-wide Python 3
+# interpreter (/usr/bin/python3) as well as through the
+# virtualenv (/usr/local/lib/mailinabox/env). So only
+# import packages at the top level of this script that
+# are installed in *both* contexts. We use the system-wide
+# Python 3 in setup/questions.sh to validate the email
+# address entered by the user.
 
 import subprocess, shutil, os, sqlite3, re
 import utils
@@ -435,9 +444,11 @@ def add_mail_alias(address, forwards_to, permitted_senders, env, update_if_exist
 				email = email.strip()
 				if email == "": continue
 				email = sanitize_idn_email_address(email) # Unicode => IDNA
+				# Strip any +tag from email alias and check privileges
+				privileged_email = re.sub(r"(?=\+)[^@]*(?=@)",'',email)
 				if not validate_email(email):
 					return ("Invalid receiver email address (%s)." % email, 400)
-				if is_dcv_source and not is_dcv_address(email) and "admin" not in get_mail_user_privileges(email, env, empty_on_error=True):
+				if is_dcv_source and not is_dcv_address(email) and "admin" not in get_mail_user_privileges(privileged_email, env, empty_on_error=True):
 					# Make domain control validation hijacking a little harder to mess up by
 					# requiring aliases for email addresses typically used in DCV to forward
 					# only to accounts that are administrators on this system.

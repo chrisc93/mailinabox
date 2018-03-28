@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/lib/mailinabox/env/bin/python
 
 # This script performs a backup of all user data:
 # 1) System services are stopped.
@@ -267,7 +267,7 @@ def perform_backup(full_backup):
 			if quit:
 				sys.exit(code)
 
-	service_command("php5-fpm", "stop", quit=True)
+	service_command("php7.0-fpm", "stop", quit=True)
 	service_command("postfix", "stop", quit=True)
 	service_command("dovecot", "stop", quit=True)
 
@@ -301,7 +301,7 @@ def perform_backup(full_backup):
 		# Start services again.
 		service_command("dovecot", "start", quit=False)
 		service_command("postfix", "start", quit=False)
-		service_command("php5-fpm", "start", quit=False)
+		service_command("php7.0-fpm", "start", quit=False)
 
 	# Once the migrated backup is included in a new backup, it can be deleted.
 	if os.path.isdir(migrated_unencrypted_backup_dir):

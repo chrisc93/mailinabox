@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/lib/mailinabox/env/bin/python
 
 # Creates DNS zone files for all of the domains of all of the mail users
 # and mail aliases and restarts nsd.
@@ -13,9 +13,10 @@ from mailconfig import get_mail_domains
 from utils import shell, load_env_vars_from_file, safe_domain_name, sort_domains
 
 # From https://stackoverflow.com/questions/3026957/how-to-validate-a-domain-name-using-regex-php/16491074#16491074
-# Thanks to Onur Yıldırım
-# This regular expression matches domain names according to RFCs, it also accepts fqdn with an leading dot
-DOMAIN_RE = "^(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}(\.?)$"
+# This regular expression matches domain names according to RFCs, it also accepts fqdn with an leading dot,
+# underscores, as well as asteriks which are allowed in domain names but not hostnames (i.e. allowed in
+# DNS but not in URLs), which are common in certain record types like for DKIM.
+DOMAIN_RE = "^(?!\-)(?:[*][.])?(?:[a-zA-Z\d\-_]{0,62}[a-zA-Z\d_]\.){1,126}(?!\d+)[a-zA-Z\d_]{1,63}(\.?)$"
 
 def get_dns_domains(env):
 	# Add all domain names in use by email users and mail aliases and ensure
@@ -527,12 +528,13 @@ zone:
 
 def dnssec_choose_algo(domain, env):
 	if '.' in domain and domain.rsplit('.')[-1] in \
-		("email", "guide", "fund", "be"):
+		("email", "guide", "fund", "be", "lv"):
 		# At GoDaddy, RSASHA256 is the only algorithm supported
 		# for .email and .guide.
 		# A variety of algorithms are supported for .fund. This
 		# is preferred.
 		# Gandi tells me that .be does not support RSASHA1-NSEC3-SHA1
+        # Nic.lv does not support RSASHA1-NSEC3-SHA1 for .lv tld's
 		return "RSASHA256"
 
 	# For any domain we were able to sign before, don't change the algorithm
@@ -764,12 +766,12 @@ def set_custom_dns_record(qname, rtype, value, action, env):
 		if qname != "_secondary_nameserver":
 			raise ValueError("%s is not a domain name or a subdomain of a domain name managed by this box." % qname)
 
-	if not re.search(DOMAIN_RE, qname):
-		raise ValueError("Invalid name.")
-
 	# validate rtype
 	rtype = rtype.upper()
 	if value is not None and qname != "_secondary_nameserver":
+		if not re.search(DOMAIN_RE, qname):
+			raise ValueError("Invalid name.")
+
 		if rtype in ("A", "AAAA"):
 			if value != "local": # "local" is a special flag for us
 				v = ipaddress.ip_address(value) # raises a ValueError if there's a problem

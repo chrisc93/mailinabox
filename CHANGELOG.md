@@ -1,6 +1,99 @@
 CHANGELOG
 =========
 
+In Development
+--------------
+
+* A report of box activity, including sent/received mail totals and logins by user, is now emailed to the box's administrator user each week.
+* Update Roundcube to version 1.3.4 and Z-Push to version 2.3.9.
+* The undocumented feature for proxying web requests to another server now sets X-Forwarded-For.
+
+v0.26c (February 13, 2018)
+--------------------------
+
+Setup:
+
+* Upgrades from v0.21c (February 1, 2017) or earlier were broken because the intermediate versions of ownCloud used in setup were no longer available from ownCloud.
+* Some download errors had no output --- there is more output on error now.
+
+Control Panel:
+
+* The background service for the control panel was not restarting on updates, leaving the old version running. This was broken in v0.26 and is now fixed.
+* Installing your own TLS/SSL certificate had been broken since v0.24 because the new version of openssl became stricter about CSR generation parameters.
+* Fixed password length help text.
+
+Contacts/Calendar:
+
+* Upgraded Nextcloud from 12.0.3 to 12.0.5.
+
+v0.26b (January 25, 2018)
+-------------------------
+
+* Fix new installations which broke at the step of asking for the user's desired email address, which was broken by v0.26's changes related to the control panel.
+* Fix the provisioning of TLS certificates by pinning a Python package we rely on (acme) to an earlier version because our code isn't yet compatible with its current version.
+* Reduce munin's log_level from debug to warning to prevent massive log files.
+
+v0.26 (January 18, 2018)
+------------------------
+
+Security:
+
+* HTTPS, IMAP, and POP's TLS settings have been updated to Mozilla's intermediate cipher list recommendation. Some extremely old devices that use less secure TLS ciphers may no longer be able to connect to IMAP/POP.
+* Updated web HSTS header to use longer six month duration.
+
+Mail:
+
+* Adding attachments in Roundcube broke after the last update for some users after rebooting because a temporary directory was deleted on reboot. The temporary directory is now moved from /tmp to /var so that it is persistent.
+* `X-Spam-Score` header is added to incoming mail.
+
+Control panel:
+
+* RSASHA256 is now used for DNSSEC for .lv domains.
+* Some documentation/links improvements.
+
+Installer:
+
+* We now run `apt-get autoremove` at the start of setup to clear out old packages, especially old kernels that take up a lot of space. On the first run, this step may take a long time.
+* We now fetch Z-Push from its tagged git repository, fixing an installation problem.
+* Some old PHP5 packages are removed from setup, fixing an installation bug where Apache would get installed.
+* Python 3 packages for the control panel are now installed using a virtualenv to prevent installation errors due to conflicts in the cryptography/openssl packages between OS-installed packages and pip-installed packages.
+
+v0.25 (November 15, 2017)
+-------------------------
+
+This update is a security update addressing [CVE-2017-16651, a vulnerability in Roundcube webmail that allows logged-in users to access files on the local filesystem](https://roundcube.net/news/2017/11/08/security-updates-1.3.3-1.2.7-and-1.1.10).
+
+Mail:
+
+* Update to Roundcube 1.3.3.
+
+Control Panel:
+
+* Allow custom DNS records to be set for DNS wildcard subdomains (i.e. `*`).
+
+v0.24 (October 3, 2017)
+-----------------------
+
+System:
+
+* Install PHP7 via a PPA. Switch to the on-demand process manager.
+
+Mail:
+
+* Updated to [Roundcube 1.3.1](https://roundcube.net/news/2017/06/26/roundcube-webmail-1.3.0-released), but unfortunately dropping the Vacation plugin because it has not been supported by its author and is not compatible with Roundcube 1.3, and updated the persistent login plugin.
+* Updated to [Z-Push 2.3.8](http://download.z-push.org/final/2.3/z-push-2.3.8.txt).
+* Dovecot now uses stronger 2048 bit DH params for better forward secrecy.
+
+Nextcloud:
+
+* Nextcloud updated to 12.0.3, using PHP7.
+
+Control Panel:
+
+* Nameserver (NS) records can now be set on custom domains.
+* Fix an erroneous status check error due to IPv6 address formatting.
+* Aliases for administrative addresses can now be set to send mail to +tag administrative addresses.
+
 v0.23a (May 31, 2017)
 ---------------------
 
