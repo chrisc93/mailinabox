@@ -17,12 +17,13 @@ source /etc/mailinabox.conf # load global vars
 
 echo "Installing Z-Push (Exchange/ActiveSync server)..."
 apt_install \
-	php7.0-soap php7.0-imap libawl-php php7.0-xsl
+	php-soap php-imap libawl-php php-xsl
 
-phpenmod -v php7.0 imap
+phpenmod -v php imap
 
 # Copy Z-Push into place.
-VERSION=2.3.9
+VERSION=2.4.4
+TARGETHASH=104d44426852429dac8ec2783a4e9ad7752d4682
 needs_update=0 #NODOC
 if [ ! -f /usr/local/lib/z-push/version ]; then
 	needs_update=1 #NODOC
@@ -31,13 +32,14 @@ elif [[ $VERSION != `cat /usr/local/lib/z-push/version` ]]; then
 	needs_update=1 #NODOC
 fi
 if [ $needs_update == 1 ]; then
-	rm -rf /usr/local/lib/z-push
+	# Download
+	wget_verify "https://stash.z-hub.io/rest/api/latest/projects/ZP/repos/z-push/archive?at=refs%2Ftags%2F$VERSION&format=zip" $TARGETHASH /tmp/z-push.zip
 
-	git_clone https://stash.z-hub.io/scm/zp/z-push.git $VERSION '' /tmp/z-push
-
-	mkdir /usr/local/lib/z-push
-	cp -r /tmp/z-push/src/* /usr/local/lib/z-push
-	rm -rf /tmp/z-push
+	# Extract into place.
+	rm -rf /usr/local/lib/z-push /tmp/z-push
+	unzip -q /tmp/z-push.zip -d /tmp/z-push
+	mv /tmp/z-push/src /usr/local/lib/z-push
+	rm -rf /tmp/z-push.zip /tmp/z-push
 
 	rm -f /usr/sbin/z-push-{admin,top}
 	ln -s /usr/local/lib/z-push/z-push-admin.php /usr/sbin/z-push-admin
@@ -100,7 +102,7 @@ EOF
 
 # Restart service.
 
-restart_service php7.0-fpm
+restart_service php7.2-fpm
 
 # Fix states after upgrade
 

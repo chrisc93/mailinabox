@@ -4,7 +4,7 @@
 
 source setup/functions.sh # load our functions
 
-# Check system setup: Are we running as root on Ubuntu 14.04 on a
+# Check system setup: Are we running as root on Ubuntu 18.04 on a
 # machine with enough memory? Is /tmp mounted with exec.
 # If not, this shows an error and exits.
 source setup/preflight.sh
@@ -14,7 +14,7 @@ source setup/preflight.sh
 # Python may not be able to read/write files. This is also
 # in the management daemon startup script and the cron script.
 
-if [ -z `locale -a | grep en_US.utf8` ]; then
+if ! locale -a | grep en_US.utf8 > /dev/null; then
     # Generate locale if not exists
     hide_output locale-gen en_US.UTF-8
 fi
@@ -60,8 +60,8 @@ source setup/questions.sh
 # Run some network checks to make sure setup on this machine makes sense.
 # Skip on existing installs since we don't want this to block the ability to
 # upgrade, and these checks are also in the control panel status checks.
-if [ -z "$DEFAULT_PRIMARY_HOSTNAME" ]; then
-if [ -z "$SKIP_NETWORK_CHECKS" ]; then
+if [ -z "${DEFAULT_PRIMARY_HOSTNAME:-}" ]; then
+if [ -z "${SKIP_NETWORK_CHECKS:-}" ]; then
 	source setup/network-checks.sh
 fi
 fi
@@ -106,7 +106,7 @@ source setup/dkim.sh
 source setup/spamassassin.sh
 source setup/web.sh
 source setup/webmail.sh
-source setup/owncloud.sh
+source setup/nextcloud.sh
 source setup/zpush.sh
 source setup/management.sh
 source setup/munin.sh
@@ -127,12 +127,22 @@ tools/web_update
 # fail2ban was first configured, but they should exist now.
 restart_service fail2ban
 
-# If DNS is already working, try to provision TLS certficates from Let's Encrypt.
-# Suppress extra reasons why domains aren't getting a new certificate.
-management/ssl_certificates.py -q
-
 # If there aren't any mail users yet, create one.
 source setup/firstuser.sh
+
+# Register with Let's Encrypt, including agreeing to the Terms of Service.
+# We'd let certbot ask the user interactively, but when this script is
+# run in the recommended curl-pipe-to-bash method there is no TTY and
+# certbot will fail if it tries to ask.
+if [ ! -d $STORAGE_ROOT/ssl/lets_encrypt/accounts/acme-v02.api.letsencrypt.org/ ]; then
+echo
+echo "-----------------------------------------------"
+echo "Mail-in-a-Box uses Let's Encrypt to provision free SSL/TLS certificates"
+echo "to enable HTTPS connections to your box. We're automatically"
+echo "agreeing you to their subscriber agreement. See https://letsencrypt.org."
+echo
+certbot register --register-unsafely-without-email --agree-tos --config-dir $STORAGE_ROOT/ssl/lets_encrypt
+fi
 
 # Done.
 echo
